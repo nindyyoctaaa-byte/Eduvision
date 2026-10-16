@@ -86,6 +86,49 @@
       color: var(--text-muted);
     }
 
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: var(--lavender-main);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: var(--mint-main);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+
+    .btn-secondary:hover {
+      opacity: 0.9;
+    }
+
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -223,6 +266,15 @@
       line-height: 1.6;
     }
 
+    .remedial-sheet {
+      background: #FFF9FA;
+      border: 1px solid var(--pink-main);
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
     .diagnostic-summary {
       background: var(--pink-light);
       border: 1px dashed var(--pink-main);
@@ -233,9 +285,8 @@
       color: var(--text-main);
     }
 
-    /* AI Chat Styling */
     .chat-box {
-      height: 220px;
+      height: 200px;
       overflow-y: auto;
       background: var(--bg-main);
       border: 1px solid var(--border-color);
@@ -325,6 +376,25 @@
       color: white;
     }
 
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      .header-actions, .file-upload, .quick-chips, .chat-input-area, .btn-clear, #aiSection {
+        display: none !important;
+      }
+      .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+      }
+      .chat-box {
+        height: auto;
+        border: none;
+      }
+    }
+
     @media (max-width: 768px) {
       .grid-2, .grid-4 { grid-template-columns: 1fr; }
     }
@@ -340,6 +410,9 @@
           <h1>AccuScore</h1>
           <p>Smart Accounting Grade & Diagnostic Hub</p>
         </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-primary" onclick="printReport()">🖨️ Cetak / Unduh Laporan PDF</button>
       </div>
     </header>
 
@@ -378,7 +451,7 @@
           <label>Upload File Excel (.xlsx)</label>
           <div class="file-upload" onclick="document.getElementById('excelFile').click()">
             <p id="uploadStatus">📄 Klik di sini untuk mengunggah File Excel Nilai</p>
-            <span style="font-size: 11px; color: var(--text-muted);">Mendukung Multi-Sheet (Rekap_Nilai & Analisis_Diagnostik)</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Mendukung Multi-Sheet & Multi-Penilaian Harian (UH1, UH2, Praktik, UTS, UAS)</span>
           </div>
           <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;" onchange="handleFileUpload(event)">
         </div>
@@ -389,7 +462,7 @@
         <div class="card-title">⚙️ Pengaturan Bobot & KKM</div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
           <div class="form-group">
-            <label>Bobot Tugas (%)</label>
+            <label>Bobot Rata Harian/Praktik (%)</label>
             <input type="number" id="bobotTugas" value="40" onchange="recalculateAndSave()">
           </div>
           <div class="form-group">
@@ -443,8 +516,19 @@
       </div>
     </div>
 
-    <!-- Section 5: Tanya AI Assistant & Consult -->
+    <!-- Section 5: Generator Remedial Otomatis -->
     <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">
+        <span>🎯 Generator Remedial Otomatis & Lembar Kerja Siswa</span>
+        <button class="btn-secondary" onclick="generateRemedialQuestions()">✨ Generasi Draf Soal Remedial</button>
+      </div>
+      <div id="remedialContainer" class="remedial-sheet">
+        Klik tombol <strong>"Generasi Draf Soal Remedial"</strong> di atas untuk membuatkan draf paket soal perbaikan otomatis khusus materi tersulit berdasarkan data kelas ini.
+      </div>
+    </div>
+
+    <!-- Section 6: Tanya AI Assistant & Consult -->
+    <div class="card" id="aiSection" style="margin-bottom: 24px;">
       <div class="card-title">🤖 Konsultasi Asisten AI (Pendidikan Akuntansi)</div>
       <div class="quick-chips">
         <button class="chip" onclick="askQuickPrompt('remedial')">🎯 Berikan Saran Strategi Remedial</button>
@@ -462,7 +546,7 @@
       </div>
     </div>
 
-    <!-- Section 6: Tabel Nilai & Diagnostik -->
+    <!-- Section 7: Tabel Nilai Multi-Penilaian & Diagnostik -->
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-title" id="tableTitle">📋 Rekapitulasi Nilai & Diagnostik Siswa</div>
       <div class="table-container">
@@ -471,7 +555,10 @@
             <tr>
               <th>No</th>
               <th>Nama Siswa</th>
-              <th>Tugas (40%)</th>
+              <th>UH 1</th>
+              <th>UH 2</th>
+              <th>Praktik</th>
+              <th>Rata Harian (40%)</th>
               <th>UTS (30%)</th>
               <th>UAS (30%)</th>
               <th>Nilai Akhir</th>
@@ -482,29 +569,34 @@
           </thead>
           <tbody id="studentTableBody">
             <tr>
-              <td colspan="9" style="text-align: center; color: var(--text-muted);">Silakan upload file Excel untuk menampilkan data.</td>
+              <td colspan="12" style="text-align: center; color: var(--text-muted);">Silakan upload file Excel untuk menampilkan data.</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Section 7: Evaluasi Rapor Otomatis -->
-    <div class="card">
+    <!-- Section 8: Evaluasi Rapor Otomatis -->
+    <div class="card" style="margin-bottom: 24px;">
       <div class="card-title">📝 Catatan Evaluasi Rapor Otomatis</div>
       <div class="narrative-box" id="narrativeText">
         Upload file Excel untuk menghasilkan ringkasan narasi evaluasi pembelajaran secara otomatis.
       </div>
     </div>
+
+    <!-- Footer Action -->
+    <div style="text-align: center; margin-bottom: 40px;" class="header-actions">
+      <button class="btn-primary" style="margin: 0 auto; padding: 12px 24px;" onclick="printReport()">🖨️ Simpan / Unduh Laporan LENGKAP Kelas Ini (PDF)</button>
+    </div>
   </div>
 
   <script>
     let defaultDummyData = [
-      { nama: "Andi Pratama", tugas: 85, uts: 78, uas: 80, topik: "Jurnal Penyesuaian", kesalahan: "Terbalik posisi Debit-Kredit" },
-      { nama: "Bunga Citra", tugas: 90, uts: 88, uas: 92, topik: "None", kesalahan: "Tidak ada" },
-      { nama: "Candra Wijaya", tugas: 65, uts: 70, uas: 60, topik: "Jurnal Penyesuaian", kesalahan: "Salah hitung nominal penyusutan" },
-      { nama: "Deni Perkasa", tugas: 75, uts: 72, uas: 70, topik: "Neraca Lajur", kesalahan: "Salah penjumlahan kolom saldo" },
-      { nama: "Eka Rahmawati", tugas: 95, uts: 90, uas: 94, topik: "None", kesalahan: "Tidak ada" }
+      { nama: "Andi Pratama", uh1: 80, uh2: 85, praktik: 90, uts: 78, uas: 80, topik: "Jurnal Penyesuaian", kesalahan: "Terbalik posisi Debit-Kredit" },
+      { nama: "Bunga Citra", uh1: 88, uh2: 90, praktik: 92, uts: 88, uas: 92, topik: "None", kesalahan: "Tidak ada" },
+      { nama: "Candra Wijaya", uh1: 60, uh2: 65, praktik: 70, uts: 70, uas: 60, topik: "Jurnal Penyesuaian", kesalahan: "Salah hitung nominal penyusutan" },
+      { nama: "Deni Perkasa", uh1: 72, uh2: 75, praktik: 78, uts: 72, uas: 70, topik: "Neraca Lajur", kesalahan: "Salah penjumlahan kolom saldo" },
+      { nama: "Eka Rahmawati", uh1: 92, uh2: 95, praktik: 98, uts: 90, uas: 94, topik: "None", kesalahan: "Tidak ada" }
     ];
 
     let studentData = [];
@@ -515,6 +607,10 @@
     window.onload = function() {
       loadClassData();
     };
+
+    function printReport() {
+      window.print();
+    }
 
     function getStorageKey() {
       const kelas = document.getElementById('selectKelas').value;
@@ -597,7 +693,10 @@
       let diagnosticCounts = {};
 
       studentData.forEach((s, index) => {
-        const finalScore = Math.round((s.tugas * wTugas) + (s.uts * wUTS) + (s.uas * wUAS));
+        const avgHarian = Math.round((s.uh1 + s.uh2 + s.praktik) / 3);
+        s.avgHarian = avgHarian;
+
+        const finalScore = Math.round((avgHarian * wTugas) + (s.uts * wUTS) + (s.uas * wUAS));
         s.finalScore = finalScore;
         s.status = finalScore >= kkm ? 'Tuntas' : 'Remedial';
 
@@ -620,7 +719,10 @@
           <tr>
             <td>${index + 1}</td>
             <td><strong>${s.nama}</strong></td>
-            <td>${s.tugas}</td>
+            <td>${s.uh1}</td>
+            <td>${s.uh2}</td>
+            <td>${s.praktik}</td>
+            <td><strong>${avgHarian}</strong></td>
             <td>${s.uts}</td>
             <td>${s.uas}</td>
             <td><strong>${finalScore}</strong></td>
@@ -657,6 +759,52 @@
 
       updateCharts(scoreGroups, diagnosticCounts);
       generateNarrative();
+    }
+
+    // Generator Soal & Remedial Otomatis
+    function generateRemedialQuestions() {
+      const kelas = document.getElementById('selectKelas').value;
+      const mapel = document.getElementById('inputMapel').value;
+      const remedialStudents = studentData.filter(s => s.status === 'Remedial');
+      const remedialNames = remedialStudents.map(s => s.nama).join(', ') || "Belum ada siswa remedial";
+
+      let sampleQuestions = "";
+      if (globalTopTopic.includes("Penyesuaian")) {
+        sampleQuestions = `
+          <strong>Soal 1 (Beban Dibayar di Muka):</strong><br>
+          Pada tanggal 1 Agustus 2026, dibayar sewa kantor untuk 1 tahun sebesar Rp12.000.000 dan dicatat menggunakan pendekatan Beban. Buatlah jurnal penyesuaian per 31 Desember 2026!<br><br>
+          <strong>Soal 2 (Penyusutan Aktiva Tetap):</strong><br>
+          Peralatan salon diperoleh seharga Rp20.000.000 dengan nilai residu Rp2.000.000 dan umur ekonomis 5 tahun. Buatlah jurnal penyesuaian beban penyusutan tahun pertama!
+        `;
+      } else if (globalTopTopic.includes("Lajur")) {
+        sampleQuestions = `
+          <strong>Soal 1 (Keseimbangan Saldo):</strong><br>
+          Jelaskan alur pemindahan angka dari kolom Jurnal Penyesuaian ke kolom Neraca Saldo Disesuaikan (NSD) pada Neraca Lajur!<br><br>
+          <strong>Soal 2 (Pengelompokan Akun):</strong><br>
+          Sebutkan kelompok akun apa saja yang harus dipindahkan ke kolom Laba/Rugi dan kolom Neraca!
+        `;
+      } else {
+        sampleQuestions = `
+          <strong>Soal 1 (Aturan Debet Kredit):</strong><br>
+          Jelaskan saldo normal untuk kelompok akun Aset, Liabilitas, Ekuitas, Pendapatan, dan Beban!<br><br>
+          <strong>Soal 2 (Studi Kasus Transaksi):</strong><br>
+          Diterima pelunasan piutang usaha sebesar Rp5.000.000. Analisis perubahan posisi akun dan catat ke dalam jurnal umum!
+        `;
+      }
+
+      document.getElementById('remedialContainer').innerHTML = `
+        <div style="border-bottom: 2px solid var(--pink-main); padding-bottom: 8px; margin-bottom: 12px; font-weight: 700; color: var(--pink-main);">
+          📄 LEMBAR KERJA REMEDIAL & PENGATASAN KENDALA (${kelas})
+        </div>
+        <p><strong>Mata Pelajaran:</strong> ${mapel}</p>
+        <p><strong>Fokus Topik Perbaikan:</strong> ${globalTopTopic}</p>
+        <p><strong>Daftar Siswa Peserta Remedial (${remedialStudents.length} Orang):</strong> <span style="color: var(--pink-main); font-weight: 600;">${remedialNames}</span></p>
+        
+        <div style="background: white; border: 1px solid var(--border-color); padding: 14px; border-radius: 8px; margin-top: 12px;">
+          <div style="font-weight: 700; color: var(--lavender-main); margin-bottom: 8px;">✏️ Draf Paket Soal Latihan Remedial:</div>
+          ${sampleQuestions}
+        </div>
+      `;
     }
 
     function updateCharts(scoreGroups, diagnosticCounts) {
@@ -801,9 +949,15 @@
             return diagNama && diagNama.toString().trim().toLowerCase() === nama.toString().trim().toLowerCase();
           }) || {};
 
+          const uh1Val = parseFloat(getCellValue(row, ["Nilai UH 1", "UH1", "UH 1", "Tugas 1"]) || 80);
+          const uh2Val = parseFloat(getCellValue(row, ["Nilai UH 2", "UH2", "UH 2", "Tugas 2"]) || 85);
+          const praktikVal = parseFloat(getCellValue(row, ["Nilai Praktik", "Praktik", "Nilai Tugas", "Tugas"]) || 85);
+
           return {
             nama: nama,
-            tugas: parseFloat(getCellValue(row, ["Nilai Tugas", "Nilai Praktik", "Tugas"]) || 0),
+            uh1: uh1Val,
+            uh2: uh2Val,
+            praktik: praktikVal,
             uts: parseFloat(getCellValue(row, ["Nilai UTS", "UTS"]) || 0),
             uas: parseFloat(getCellValue(row, ["Nilai UAS", "UAS"]) || 0),
             topik: getCellValue(diagInfo, ["Materi yang Paling Sulit", "Materi Tersebut", "Topik Sulit", "Topik", "Materi"]) || "None",
