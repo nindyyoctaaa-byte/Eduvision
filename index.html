@@ -463,20 +463,20 @@
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
           <div class="form-group">
             <label>Bobot Rata Harian/Praktik (%)</label>
-            <input type="number" id="bobotTugas" value="40" onchange="recalculateAndSave()">
+            <input type="number" id="bobotTugas" value="40" oninput="recalculateAndSave()">
           </div>
           <div class="form-group">
             <label>Bobot UTS (%)</label>
-            <input type="number" id="bobotUTS" value="30" onchange="recalculateAndSave()">
+            <input type="number" id="bobotUTS" value="30" oninput="recalculateAndSave()">
           </div>
           <div class="form-group">
             <label>Bobot UAS (%)</label>
-            <input type="number" id="bobotUAS" value="30" onchange="recalculateAndSave()">
+            <input type="number" id="bobotUAS" value="30" oninput="recalculateAndSave()">
           </div>
         </div>
         <div class="form-group" style="margin-top: 10px;">
           <label>Batas KKM Akuntansi</label>
-          <input type="number" id="kkmValue" value="75" onchange="recalculateAndSave()">
+          <input type="number" id="kkmValue" value="75" oninput="recalculateAndSave()">
         </div>
       </div>
     </div>
@@ -558,9 +558,9 @@
               <th>UH 1</th>
               <th>UH 2</th>
               <th>Praktik</th>
-              <th>Rata Harian (40%)</th>
-              <th>UTS (30%)</th>
-              <th>UAS (30%)</th>
+              <th id="thHarian">Rata Harian (40%)</th>
+              <th id="thUTS">UTS (30%)</th>
+              <th id="thUAS">UAS (30%)</th>
               <th>Nilai Akhir</th>
               <th>Status</th>
               <th>Topik Sulit</th>
@@ -630,10 +630,10 @@
         try {
           const parsed = JSON.parse(saved);
           studentData = parsed.students || [];
-          document.getElementById('bobotTugas').value = parsed.wTugas || 40;
-          document.getElementById('bobotUTS').value = parsed.wUTS || 30;
-          document.getElementById('bobotUAS').value = parsed.wUAS || 30;
-          document.getElementById('kkmValue').value = parsed.kkm || 75;
+          document.getElementById('bobotTugas').value = parsed.wTugas !== undefined ? parsed.wTugas : 40;
+          document.getElementById('bobotUTS').value = parsed.wUTS !== undefined ? parsed.wUTS : 30;
+          document.getElementById('bobotUAS').value = parsed.wUAS !== undefined ? parsed.wUAS : 30;
+          document.getElementById('kkmValue').value = parsed.kkm !== undefined ? parsed.kkm : 75;
           document.getElementById('uploadStatus').innerText = `💾 Dimuat dari Memori Terpanjang (${studentData.length} Siswa)`;
         } catch (e) {
           studentData = [...defaultDummyData];
@@ -676,10 +676,20 @@
       const mapel = document.getElementById('inputMapel').value;
       document.getElementById('tableTitle').innerText = `📋 Rekapitulasi Nilai & Diagnostik Siswa - ${mapel} (${kelas})`;
 
-      const wTugas = parseFloat(document.getElementById('bobotTugas').value) / 100;
-      const wUTS = parseFloat(document.getElementById('bobotUTS').value) / 100;
-      const wUAS = parseFloat(document.getElementById('bobotUAS').value) / 100;
-      const kkm = parseFloat(document.getElementById('kkmValue').value);
+      // Ambil nilai bobot secara aman
+      const valTugas = parseFloat(document.getElementById('bobotTugas').value) || 0;
+      const valUTS = parseFloat(document.getElementById('bobotUTS').value) || 0;
+      const valUAS = parseFloat(document.getElementById('bobotUAS').value) || 0;
+      const kkm = parseFloat(document.getElementById('kkmValue').value) || 75;
+
+      // Update Teks Judul Kolom Tabel
+      document.getElementById('thHarian').innerText = `Rata Harian (${valTugas}%)`;
+      document.getElementById('thUTS').innerText = `UTS (${valUTS}%)`;
+      document.getElementById('thUAS').innerText = `UAS (${valUAS}%)`;
+
+      const wTugas = valTugas / 100;
+      const wUTS = valUTS / 100;
+      const wUAS = valUAS / 100;
 
       let totalAvg = 0;
       let maxVal = -1;
@@ -693,10 +703,17 @@
       let diagnosticCounts = {};
 
       studentData.forEach((s, index) => {
-        const avgHarian = Math.round((s.uh1 + s.uh2 + s.praktik) / 3);
+        const uh1 = parseFloat(s.uh1) || 0;
+        const uh2 = parseFloat(s.uh2) || 0;
+        const praktik = parseFloat(s.praktik) || 0;
+        const uts = parseFloat(s.uts) || 0;
+        const uas = parseFloat(s.uas) || 0;
+
+        const avgHarian = Math.round((uh1 + uh2 + praktik) / 3);
         s.avgHarian = avgHarian;
 
-        const finalScore = Math.round((avgHarian * wTugas) + (s.uts * wUTS) + (s.uas * wUAS));
+        // Kalkulasi Nilai Akhir Otomatis Berdasarkan Bobot Baru
+        const finalScore = Math.round((avgHarian * wTugas) + (uts * wUTS) + (uas * wUAS));
         s.finalScore = finalScore;
         s.status = finalScore >= kkm ? 'Tuntas' : 'Remedial';
 
@@ -719,12 +736,12 @@
           <tr>
             <td>${index + 1}</td>
             <td><strong>${s.nama}</strong></td>
-            <td>${s.uh1}</td>
-            <td>${s.uh2}</td>
-            <td>${s.praktik}</td>
+            <td>${uh1}</td>
+            <td>${uh2}</td>
+            <td>${praktik}</td>
             <td><strong>${avgHarian}</strong></td>
-            <td>${s.uts}</td>
-            <td>${s.uas}</td>
+            <td>${uts}</td>
+            <td>${uas}</td>
             <td><strong>${finalScore}</strong></td>
             <td><span class="badge ${badgeClass}">${s.status}</span></td>
             <td><span style="font-weight: 600; color: ${s.topik !== 'None' && s.topik !== 'Tidak ada' ? 'var(--pink-main)' : 'var(--mint-main)'}">${s.topik}</span></td>
@@ -736,7 +753,7 @@
       const count = studentData.length;
       document.getElementById('metricAvg').innerText = count ? (totalAvg / count).toFixed(1) : '0';
       document.getElementById('metricMax').innerText = count ? maxVal : '0';
-      document.getElementById('metricMin').innerText = count ? minVal : '0';
+      document.getElementById('metricMin').innerText = count ? (minVal === 101 ? 0 : minVal) : '0';
       document.getElementById('metricPass').innerText = count ? Math.round((passedCount / count) * 100) + '%' : '0%';
 
       let topTopic = "";
@@ -761,7 +778,6 @@
       generateNarrative();
     }
 
-    // Generator Soal & Remedial Otomatis
     function generateRemedialQuestions() {
       const kelas = document.getElementById('selectKelas').value;
       const mapel = document.getElementById('inputMapel').value;
