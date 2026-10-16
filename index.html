@@ -49,7 +49,6 @@
       margin: 0 auto;
     }
 
-    /* Header */
     header {
       display: flex;
       justify-content: space-between;
@@ -87,7 +86,6 @@
       color: var(--text-muted);
     }
 
-    /* Grid Layouts */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -102,7 +100,6 @@
       margin-bottom: 24px;
     }
 
-    /* Card Styling */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -118,10 +115,9 @@
       margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
     }
 
-    /* Form Controls */
     .form-group {
       margin-bottom: 12px;
     }
@@ -153,7 +149,7 @@
       border: 2px dashed var(--lavender-main);
       background: var(--lavender-light);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 20px;
       text-align: center;
       cursor: pointer;
       transition: 0.2s;
@@ -170,7 +166,6 @@
       font-weight: 600;
     }
 
-    /* Metric Cards */
     .metric-card {
       padding: 16px;
       border-radius: var(--radius);
@@ -184,7 +179,6 @@
     .metric-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
     .metric-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
 
-    /* Table Styling */
     .table-container {
       overflow-x: auto;
     }
@@ -209,7 +203,6 @@
       border-bottom: 1px solid var(--border-color);
     }
 
-    /* Status Badges */
     .badge {
       padding: 4px 12px;
       border-radius: 20px;
@@ -221,7 +214,6 @@
     .badge-tuntas { background: var(--mint-light); color: var(--mint-main); }
     .badge-remedial { background: var(--pink-light); color: var(--pink-main); }
 
-    /* Narrative Box */
     .narrative-box {
       background: var(--lavender-light);
       border-left: 4px solid var(--lavender-main);
@@ -229,6 +221,108 @@
       border-radius: 8px;
       font-size: 14px;
       line-height: 1.6;
+    }
+
+    .diagnostic-summary {
+      background: var(--pink-light);
+      border: 1px dashed var(--pink-main);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    /* AI Chat Styling */
+    .chat-box {
+      height: 220px;
+      overflow-y: auto;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .chat-msg.ai {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      align-self: flex-start;
+      color: var(--text-main);
+    }
+
+    .chat-msg.user {
+      background: var(--lavender-main);
+      color: white;
+      align-self: flex-end;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+    }
+
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      background: var(--lavender-light);
+      color: var(--lavender-main);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .chip:hover {
+      background: var(--lavender-main);
+      color: white;
+    }
+
+    .btn-send {
+      background: var(--lavender-main);
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-clear {
+      background: var(--pink-light);
+      color: var(--pink-main);
+      border: 1px solid var(--pink-main);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-clear:hover {
+      background: var(--pink-main);
+      color: white;
     }
 
     @media (max-width: 768px) {
@@ -239,7 +333,6 @@
 <body>
 
   <div class="container">
-    <!-- Header -->
     <header>
       <div class="brand">
         <div class="brand-icon">A</div>
@@ -250,14 +343,17 @@
       </div>
     </header>
 
-    <!-- Section 1: Input Metadata & Upload Excel -->
+    <!-- Section 1: Metadata & Upload -->
     <div class="grid-2">
       <div class="card">
-        <div class="card-title">📌 Identitas Pembelajaran</div>
+        <div class="card-title">
+          <span>📌 Identitas Pembelajaran</span>
+          <button class="btn-clear" onclick="clearCurrentClassData()" title="Hapus memori data kelas ini">🗑️ Reset Kelas</button>
+        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group">
             <label for="selectKelas">Pilih Kelas</label>
-            <select id="selectKelas" onchange="updateDashboard()">
+            <select id="selectKelas" onchange="onClassOrMapelChange()">
               <optgroup label="Kelas X">
                 <option value="X AKL 1">X AKL 1</option>
                 <option value="X AKL 2">X AKL 2</option>
@@ -274,14 +370,14 @@
           </div>
           <div class="form-group">
             <label for="inputMapel">Mata Pelajaran</label>
-            <input type="text" id="inputMapel" value="Praktikum Akuntansi Perusahaan Jasa" oninput="updateDashboard()">
+            <input type="text" id="inputMapel" value="Praktikum Akuntansi Perusahaan Jasa" oninput="onClassOrMapelChange()">
           </div>
         </div>
 
         <div class="form-group" style="margin-top: 10px;">
           <label>Upload File Excel (.xlsx)</label>
           <div class="file-upload" onclick="document.getElementById('excelFile').click()">
-            <p>📄 Klik di sini untuk mengunggah File Excel Nilai</p>
+            <p id="uploadStatus">📄 Klik di sini untuk mengunggah File Excel Nilai</p>
             <span style="font-size: 11px; color: var(--text-muted);">Mendukung Multi-Sheet (Rekap_Nilai & Analisis_Diagnostik)</span>
           </div>
           <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;" onchange="handleFileUpload(event)">
@@ -294,20 +390,20 @@
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
           <div class="form-group">
             <label>Bobot Tugas (%)</label>
-            <input type="number" id="bobotTugas" value="40" onchange="recalculate()">
+            <input type="number" id="bobotTugas" value="40" onchange="recalculateAndSave()">
           </div>
           <div class="form-group">
             <label>Bobot UTS (%)</label>
-            <input type="number" id="bobotUTS" value="30" onchange="recalculate()">
+            <input type="number" id="bobotUTS" value="30" onchange="recalculateAndSave()">
           </div>
           <div class="form-group">
             <label>Bobot UAS (%)</label>
-            <input type="number" id="bobotUAS" value="30" onchange="recalculate()">
+            <input type="number" id="bobotUAS" value="30" onchange="recalculateAndSave()">
           </div>
         </div>
         <div class="form-group" style="margin-top: 10px;">
           <label>Batas KKM Akuntansi</label>
-          <input type="number" id="kkmValue" value="75" onchange="recalculate()">
+          <input type="number" id="kkmValue" value="75" onchange="recalculateAndSave()">
         </div>
       </div>
     </div>
@@ -332,7 +428,7 @@
       </div>
     </div>
 
-    <!-- Section 4: Charts -->
+    <!-- Section 4: Charts & Diagnostic Summary -->
     <div class="grid-2">
       <div class="card">
         <div class="card-title">📊 Sebaran Distribusi Nilai</div>
@@ -340,11 +436,33 @@
       </div>
       <div class="card">
         <div class="card-title">🔍 Diagnostik Kesalahan Siklus Akuntansi</div>
-        <canvas id="diagnosticChart" height="180"></canvas>
+        <div id="diagnosticAlert" class="diagnostic-summary">
+          ⚠️ <strong>Analisis Diagnostik:</strong> Mengunggah data diagnostik dari Sheet 2...
+        </div>
+        <canvas id="diagnosticChart" height="160"></canvas>
       </div>
     </div>
 
-    <!-- Section 5: Tabel Nilai & Diagnostik -->
+    <!-- Section 5: Tanya AI Assistant & Consult -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">🤖 Konsultasi Asisten AI (Pendidikan Akuntansi)</div>
+      <div class="quick-chips">
+        <button class="chip" onclick="askQuickPrompt('remedial')">🎯 Berikan Saran Strategi Remedial</button>
+        <button class="chip" onclick="askQuickPrompt('analisis')">📊 Analisis Kritis Kondisi Kelas</button>
+        <button class="chip" onclick="askQuickPrompt('tips')">💡 Tips Mengajar Materi Tersulit</button>
+      </div>
+      <div class="chat-box" id="chatBox">
+        <div class="chat-msg ai">
+          Halo Bapak/Ibu Guru! Saya adalah Asisten AI AccuScore. Silakan upload file nilai kelas Anda, lalu tanyakan strategi pembelajaran, rancangan remedial, atau analisis kendala akuntansi siswa di sini.
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ketik pertanyaan untuk AI seputar evaluasi nilai..." onkeypress="handleKeyPress(event)">
+        <button class="btn-send" onclick="sendUserMessage()">Kirim</button>
+      </div>
+    </div>
+
+    <!-- Section 6: Tabel Nilai & Diagnostik -->
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-title" id="tableTitle">📋 Rekapitulasi Nilai & Diagnostik Siswa</div>
       <div class="table-container">
@@ -371,7 +489,7 @@
       </div>
     </div>
 
-    <!-- Section 6: Evaluasi Rapor Otomatis -->
+    <!-- Section 7: Evaluasi Rapor Otomatis -->
     <div class="card">
       <div class="card-title">📝 Catatan Evaluasi Rapor Otomatis</div>
       <div class="narrative-box" id="narrativeText">
@@ -381,8 +499,7 @@
   </div>
 
   <script>
-    // Data Default/Dummy
-    let studentData = [
+    let defaultDummyData = [
       { nama: "Andi Pratama", tugas: 85, uts: 78, uas: 80, topik: "Jurnal Penyesuaian", kesalahan: "Terbalik posisi Debit-Kredit" },
       { nama: "Bunga Citra", tugas: 90, uts: 88, uas: 92, topik: "None", kesalahan: "Tidak ada" },
       { nama: "Candra Wijaya", tugas: 65, uts: 70, uas: 60, topik: "Jurnal Penyesuaian", kesalahan: "Salah hitung nominal penyusutan" },
@@ -390,21 +507,79 @@
       { nama: "Eka Rahmawati", tugas: 95, uts: 90, uas: 94, topik: "None", kesalahan: "Tidak ada" }
     ];
 
+    let studentData = [];
     let barChartInstance = null;
     let diagnosticChartInstance = null;
+    let globalTopTopic = "Jurnal Penyesuaian";
 
     window.onload = function() {
-      recalculate();
+      loadClassData();
     };
 
-    function updateDashboard() {
+    function getStorageKey() {
       const kelas = document.getElementById('selectKelas').value;
-      const mapel = document.getElementById('inputMapel').value;
-      document.getElementById('tableTitle').innerText = `📋 Rekapitulasi Nilai & Diagnostik Siswa - ${mapel} (${kelas})`;
-      generateNarrative();
+      const mapel = document.getElementById('inputMapel').value.trim();
+      return `accuScore_${kelas}_${mapel}`;
+    }
+
+    function onClassOrMapelChange() {
+      loadClassData();
+    }
+
+    function loadClassData() {
+      const key = getStorageKey();
+      const saved = localStorage.getItem(key);
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          studentData = parsed.students || [];
+          document.getElementById('bobotTugas').value = parsed.wTugas || 40;
+          document.getElementById('bobotUTS').value = parsed.wUTS || 30;
+          document.getElementById('bobotUAS').value = parsed.wUAS || 30;
+          document.getElementById('kkmValue').value = parsed.kkm || 75;
+          document.getElementById('uploadStatus').innerText = `💾 Dimuat dari Memori Terpanjang (${studentData.length} Siswa)`;
+        } catch (e) {
+          studentData = [...defaultDummyData];
+        }
+      } else {
+        studentData = [...defaultDummyData];
+        document.getElementById('uploadStatus').innerText = `📄 Klik di sini untuk mengunggah File Excel Nilai`;
+      }
+
+      recalculate();
+    }
+
+    function saveClassData() {
+      const key = getStorageKey();
+      const dataToSave = {
+        students: studentData,
+        wTugas: document.getElementById('bobotTugas').value,
+        wUTS: document.getElementById('bobotUTS').value,
+        wUAS: document.getElementById('bobotUAS').value,
+        kkm: document.getElementById('kkmValue').value
+      };
+      localStorage.setItem(key, JSON.stringify(dataToSave));
+    }
+
+    function clearCurrentClassData() {
+      const key = getStorageKey();
+      if (confirm(`Apakah Anda yakin ingin menghapus memori penyimpanan untuk ${document.getElementById('selectKelas').value}?`)) {
+        localStorage.removeItem(key);
+        loadClassData();
+      }
+    }
+
+    function recalculateAndSave() {
+      recalculate();
+      saveClassData();
     }
 
     function recalculate() {
+      const kelas = document.getElementById('selectKelas').value;
+      const mapel = document.getElementById('inputMapel').value;
+      document.getElementById('tableTitle').innerText = `📋 Rekapitulasi Nilai & Diagnostik Siswa - ${mapel} (${kelas})`;
+
       const wTugas = parseFloat(document.getElementById('bobotTugas').value) / 100;
       const wUTS = parseFloat(document.getElementById('bobotUTS').value) / 100;
       const wUAS = parseFloat(document.getElementById('bobotUAS').value) / 100;
@@ -431,18 +606,15 @@
         if (finalScore < minVal) minVal = finalScore;
         if (s.status === 'Tuntas') passedCount++;
 
-        // Distribusi Nilai
         if (finalScore <= 60) scoreGroups["0-60"]++;
         else if (finalScore <= 75) scoreGroups["61-75"]++;
         else if (finalScore <= 85) scoreGroups["76-85"]++;
         else scoreGroups["86-100"]++;
 
-        // Diagnostik
-        if (s.topik && s.topik !== "None") {
+        if (s.topik && s.topik !== "None" && s.topik !== "Tidak ada") {
           diagnosticCounts[s.topik] = (diagnosticCounts[s.topik] || 0) + 1;
         }
 
-        // Render Tabel
         const badgeClass = s.status === 'Tuntas' ? 'badge-tuntas' : 'badge-remedial';
         tbody.innerHTML += `
           <tr>
@@ -453,25 +625,41 @@
             <td>${s.uas}</td>
             <td><strong>${finalScore}</strong></td>
             <td><span class="badge ${badgeClass}">${s.status}</span></td>
-            <td>${s.topik}</td>
+            <td><span style="font-weight: 600; color: ${s.topik !== 'None' && s.topik !== 'Tidak ada' ? 'var(--pink-main)' : 'var(--mint-main)'}">${s.topik}</span></td>
             <td style="color: var(--text-muted); font-size: 13px;">${s.kesalahan}</td>
           </tr>
         `;
       });
 
-      // Update Metrik
       const count = studentData.length;
       document.getElementById('metricAvg').innerText = count ? (totalAvg / count).toFixed(1) : '0';
       document.getElementById('metricMax').innerText = count ? maxVal : '0';
       document.getElementById('metricMin').innerText = count ? minVal : '0';
       document.getElementById('metricPass').innerText = count ? Math.round((passedCount / count) * 100) + '%' : '0%';
 
+      let topTopic = "";
+      let maxCount = 0;
+      for (let topic in diagnosticCounts) {
+        if (diagnosticCounts[topic] > maxCount) {
+          maxCount = diagnosticCounts[topic];
+          topTopic = topic;
+        }
+      }
+      globalTopTopic = topTopic || "Pencatatan Siklus Umum";
+
+      const alertBox = document.getElementById('diagnosticAlert');
+      if (topTopic) {
+        const percent = Math.round((maxCount / count) * 100);
+        alertBox.innerHTML = `⚠️ <strong>Akar Masalah Utama:</strong> Sebanyak <strong>${maxCount} siswa (${percent}%)</strong> mengalami kesulitan terbesar pada materi <strong>${topTopic}</strong>.`;
+      } else {
+        alertBox.innerHTML = `✅ <strong>Sempurna:</strong> Tidak ditemukan kendala kualitatif signifikan pada siklus akuntansi kelas ini.`;
+      }
+
       updateCharts(scoreGroups, diagnosticCounts);
-      updateDashboard();
+      generateNarrative();
     }
 
     function updateCharts(scoreGroups, diagnosticCounts) {
-      // Bar Chart Sebaran Nilai
       const ctxBar = document.getElementById('barChart').getContext('2d');
       if (barChartInstance) barChartInstance.destroy();
 
@@ -489,17 +677,19 @@
         options: { responsive: true, plugins: { legend: { display: false } } }
       });
 
-      // Donut Chart Diagnostik
       const ctxDiag = document.getElementById('diagnosticChart').getContext('2d');
       if (diagnosticChartInstance) diagnosticChartInstance.destroy();
+
+      const diagLabels = Object.keys(diagnosticCounts);
+      const diagData = Object.values(diagnosticCounts);
 
       diagnosticChartInstance = new Chart(ctxDiag, {
         type: 'doughnut',
         data: {
-          labels: Object.keys(diagnosticCounts).length ? Object.keys(diagnosticCounts) : ["Tidak ada kendala"],
+          labels: diagLabels.length ? diagLabels : ["Tidak Ada Kendala"],
           datasets: [{
-            data: Object.keys(diagnosticCounts).length ? Object.values(diagnosticCounts) : [1],
-            backgroundColor: ['#FF85A1', '#8A4FFF', '#2EC4B6', '#FFD166']
+            data: diagData.length ? diagData : [1],
+            backgroundColor: ['#FF85A1', '#8A4FFF', '#2EC4B6', '#FFD166', '#4EA8DE']
           }]
         },
         options: { responsive: true }
@@ -513,11 +703,82 @@
       const passRate = document.getElementById('metricPass').innerText;
 
       document.getElementById('narrativeText').innerHTML = `
-        Secara keseluruhan, capaian pembelajaran mata pelajaran <strong>${mapel}</strong> untuk kelas <strong>${kelas}</strong> menunjukkan nilai rata-rata sebesar <strong>${avg}</strong> dengan tingkat ketuntasan kelas mencapai <strong>${passRate}</strong>. Sebagian besar siswa yang memerlukan perbaikan disarankan untuk mengikuti bimbingan khusus pada topik materi yang teridentifikasi mengalami kendala teknis.
+        Secara keseluruhan, capaian pembelajaran mata pelajaran <strong>${mapel}</strong> untuk kelas <strong>${kelas}</strong> menunjukkan nilai rata-rata sebesar <strong>${avg}</strong> dengan tingkat ketuntasan kelas mencapai <strong>${passRate}</strong>. Sebagian besar siswa yang memerlukan perbaikan disarankan untuk mengikuti bimbingan khusus pada topik materi <strong>${globalTopTopic}</strong>.
       `;
     }
 
-    // Handle Upload Excel Multi-Sheet
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendUserMessage();
+    }
+
+    function askQuickPrompt(type) {
+      const kelas = document.getElementById('selectKelas').value;
+      const mapel = document.getElementById('inputMapel').value;
+      const passRate = document.getElementById('metricPass').innerText;
+      let promptText = "";
+
+      if (type === 'remedial') {
+        promptText = `Bagaimana rancangan program remedial yang efektif untuk kelas ${kelas} pada mapel ${mapel} yang terkendala di materi ${globalTopTopic}?`;
+      } else if (type === 'analisis') {
+        promptText = `Tolong berikan analisis kritis terhadap ketuntasan kelas sebesar ${passRate} dan kendala utama siswa pada ${globalTopTopic}.`;
+      } else if (type === 'tips') {
+        promptText = `Berikan tips dan trik metode pembelajaran interaktif untuk mengatasi kesalahan siswa pada materi ${globalTopTopic}.`;
+      }
+
+      appendMessage(promptText, 'user');
+      processAIResponse(type);
+    }
+
+    function sendUserMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      input.value = '';
+
+      setTimeout(() => {
+        let aiReply = `Berdasarkan data kelas ${document.getElementById('selectKelas').value} pada materi **${globalTopTopic}**, pendekatan terbaik adalah menggunakan metode *peer tutoring* (tutor sebaya) serta memperbanyak latihan lembar kerja interaktif berbasis siklus akuntansi riil.`;
+        appendMessage(aiReply, 'ai');
+      }, 600);
+    }
+
+    function processAIResponse(type) {
+      setTimeout(() => {
+        const kelas = document.getElementById('selectKelas').value;
+        const passRate = document.getElementById('metricPass').innerText;
+        let reply = "";
+
+        if (type === 'remedial') {
+          reply = `🎯 **Rekomendasi Program Remedial (${kelas}):**\n1. Fokuskan bimbingan kelompok kecil pada topik **${globalTopTopic}**.\n2. Berikan latihan ulang khusus pencatatan jurnal dengan penekanan pada aturan debet-kredit.\n3. Lakukan re-test setelah 3 hari pendampingan intensif.`;
+        } else if (type === 'analisis') {
+          reply = `📊 **Analisis Kritis Kelas (${kelas}):**\nTingkat ketuntasan saat ini berada di angka **${passRate}**. Hambatan terbesar terpusat pada pemahaman konsep **${globalTopTopic}**. Hal ini menunjukkan perlunya penguatan dasar logika akuntansi sebelum masuk ke tahap penyusunan laporan keuangan akhir.`;
+        } else if (type === 'tips') {
+          reply = `💡 **Tips Mengajar Interaktif:**\nUntuk mengatasi kendala pada **${globalTopTopic}**, gunakan media papan alur (*flowchart*) atau simulasi kartu akun digital agar siswa dapat memvisualisasikan perpindahan posisi akun dengan lebih konkret.`;
+        }
+        appendMessage(reply, 'ai');
+      }, 700);
+    }
+
+    function appendMessage(text, sender) {
+      const chatBox = document.getElementById('chatBox');
+      const formattedText = text.replace(/\n/g, '<br>');
+      chatBox.innerHTML += `<div class="chat-msg ${sender}">${formattedText}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getCellValue(row, possibleNames) {
+      for (let key in row) {
+        const cleanKey = key.trim().toLowerCase();
+        for (let name of possibleNames) {
+          if (cleanKey === name.toLowerCase()) {
+            return row[key];
+          }
+        }
+      }
+      return null;
+    }
+
     function handleFileUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -527,7 +788,6 @@
         const data = new Uint8Array(evt.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
 
-        // Membaca Sheet 1 (Rekap_Nilai) & Sheet 2 (Analisis_Diagnostik)
         const sheet1 = workbook.Sheets[workbook.SheetNames[0]];
         const sheet2 = workbook.SheetNames[1] ? workbook.Sheets[workbook.SheetNames[1]] : null;
 
@@ -535,18 +795,28 @@
         const rawDiag = sheet2 ? XLSX.utils.sheet_to_json(sheet2) : [];
 
         studentData = rawScores.map(row => {
-          const diagInfo = rawDiag.find(d => d["Nama Siswa"] === row["Nama Siswa"]) || {};
+          const nama = getCellValue(row, ["Nama Siswa", "Nama", "Student Name"]) || "Tanpa Nama";
+          const diagInfo = rawDiag.find(d => {
+            const diagNama = getCellValue(d, ["Nama Siswa", "Nama", "Student Name"]);
+            return diagNama && diagNama.toString().trim().toLowerCase() === nama.toString().trim().toLowerCase();
+          }) || {};
+
           return {
-            nama: row["Nama Siswa"] || "Tanpa Nama",
-            tugas: parseFloat(row["Nilai Tugas"] || row["Nilai Praktik"] || 0),
-            uts: parseFloat(row["Nilai UTS"] || 0),
-            uas: parseFloat(row["Nilai UAS"] || 0),
-            topik: diagInfo["Materi Tersebut"] || diagInfo["Materi yang Paling Sulit"] || "None",
-            kesalahan: diagInfo["Detail Kesalahan"] || diagInfo["Jenis Kesalahan Detail"] || "Tidak ada"
+            nama: nama,
+            tugas: parseFloat(getCellValue(row, ["Nilai Tugas", "Nilai Praktik", "Tugas"]) || 0),
+            uts: parseFloat(getCellValue(row, ["Nilai UTS", "UTS"]) || 0),
+            uas: parseFloat(getCellValue(row, ["Nilai UAS", "UAS"]) || 0),
+            topik: getCellValue(diagInfo, ["Materi yang Paling Sulit", "Materi Tersebut", "Topik Sulit", "Topik", "Materi"]) || "None",
+            kesalahan: getCellValue(diagInfo, ["Jenis Kesalahan Detail", "Detail Kesalahan", "Kesalahan"]) || "Tidak ada"
           };
         });
 
-        recalculate();
+        recalculateAndSave();
+        document.getElementById('uploadStatus').innerText = `✅ Berhasil Diunggah & Disimpan: ${file.name}`;
+
+        setTimeout(() => {
+          appendMessage(`🤖 Berhasil menyimpan data kelas ${document.getElementById('selectKelas').value}! Saya mendeteksi hambatan utama berada pada materi **${globalTopTopic}** dengan ketuntasan **${document.getElementById('metricPass').innerText}**.`, 'ai');
+        }, 500);
       };
       reader.readAsArrayBuffer(file);
     }
